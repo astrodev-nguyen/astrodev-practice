@@ -1,57 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Active Recall Practice</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- React & Babel Core -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --bg-base: hsl(240, 6%, 7%);
-            --bg-mesh: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
-                       radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15), transparent 25%);
-            --surface: rgba(24, 24, 27, 0.65);
-            --surface-hover: rgba(39, 39, 42, 0.8);
-            --border: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(255, 255, 255, 0.15);
-            
-            --text-main: hsl(240, 5%, 96%);
-            --text-muted: hsl(240, 5%, 65%);
-            
+            --bg-dark: #09090b;
+            /* Zinc 950 */
+            --surface: rgba(18, 18, 24, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(168, 85, 247, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
             --accent-glow: rgba(99, 102, 241, 0.4);
-            --accent-grad: linear-gradient(135deg, #6366f1, #a855f7);
-            --accent-grad-hover: linear-gradient(135deg, #4f46e5, #9333ea);
-            
+            --accent-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --accent-grad-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
             --success: #34d399;
             --danger: #fb7185;
-            
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --shadow-float: 0 20px 40px -10px rgba(0,0,0,0.5);
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 32px;
+            --shadow-float: 0 20px 60px -15px rgba(0, 0, 0, 0.6);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
-            font-family: var(--font-main);
-            background-color: var(--bg-base);
-            background-image: var(--bg-mesh);
-            background-attachment: fixed;
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            line-height: 1.6;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
+            margin: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        /* ORBIT DYNAMICS */
+        .bg-orbit {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(18, 18, 24, 0) 0%, rgba(9, 9, 11, 1) 100%);
+        }
+
+        .orbit-node {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.12;
+            animation: orbit 20s infinite alternate ease-in-out;
+        }
+
+        .node1 {
+            width: 50vw;
+            height: 50vw;
+            background: #6366f1;
+            top: -15%;
+            left: -10%;
+            animation-duration: 25s;
+        }
+
+        .node2 {
+            width: 45vw;
+            height: 45vw;
+            background: #a855f7;
+            bottom: -15%;
+            right: -10%;
+            animation-delay: -5s;
+            animation-duration: 30s;
+        }
+
+        .node3 {
+            width: 35vw;
+            height: 35vw;
+            background: #ec4899;
+            top: 30%;
+            right: 10%;
+            animation-delay: -12s;
+            animation-duration: 22s;
+        }
+
+        @keyframes orbit {
+            from {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+
+            to {
+                transform: translate(8vw, 6vh) rotate(45deg) scale(1.15);
+            }
         }
 
         /* 
@@ -62,7 +120,8 @@
             width: 100%;
             max-width: 1536px;
             margin: 0 auto;
-            padding: 2.5rem 2.5rem; /* px-10 roughly */
+            padding: 2.5rem 2.5rem;
+            /* px-10 roughly */
             display: flex;
             flex-direction: column;
             gap: 2rem;
@@ -70,8 +129,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         header {
@@ -115,12 +181,12 @@
             align-items: center;
             justify-content: space-between;
             gap: 2rem;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
             padding: 1rem 3rem;
             border-radius: var(--radius-md);
             border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 100%;
         }
 
@@ -133,10 +199,16 @@
         }
 
         @media (max-width: 1024px) {
-            .dashboard-top { grid-template-columns: 1fr; }
+            .dashboard-top {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .level-info { text-align: center; min-width: 180px; }
+        .level-info {
+            text-align: center;
+            min-width: 180px;
+        }
+
         .difficulty-stepper button {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -154,9 +226,26 @@
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
         }
 
-        .level-info { text-align: center; min-width: 180px; }
-        .level-badge { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em; color: #a855f7; font-weight: 700; display: block; margin-bottom: 0.2rem; }
-        .level-name { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.02em; }
+        .level-info {
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .level-badge {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #a855f7;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .level-name {
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
 
         /* Stats Layer */
         .stats-grid {
@@ -175,28 +264,62 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .stat-card:hover {
             transform: translateY(-4px);
             border-color: var(--border-highlight);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
         }
 
         .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: transparent; transition: background 0.3s ease;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: transparent;
+            transition: background 0.3s ease;
         }
 
-        .stat-card.active-stat:hover::before { background: var(--accent-grad); }
-        .stat-card.correct-stat:hover::before { background: var(--success); }
+        .stat-card.active-stat:hover::before {
+            background: var(--accent-grad);
+        }
 
-        .stat-value { font-size: 3rem; font-weight: 700; line-height: 1; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
-        .stat-label { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+        .stat-card.correct-stat:hover::before {
+            background: var(--success);
+        }
 
-        .val-acc { background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(168, 85, 247, 0.3)); }
-        .val-cor { color: var(--success); text-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .val-acc {
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(168, 85, 247, 0.3));
+        }
+
+        .val-cor {
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+        }
 
         /* 
          * 2-COLUMN GRID (LAPTOP) 
@@ -246,154 +369,464 @@
             gap: 0.75rem;
         }
 
-        .panel-title svg { color: #a855f7; }
-        .panel-actions { display: flex; gap: 0.75rem; align-items: center; }
+        .panel-title svg {
+            color: #a855f7;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
 
         /* Buttons Formulation */
         button {
-            cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 600;
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            border-radius: var(--radius-sm); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 0.6rem 1.25rem;
         }
 
         .primary {
-            background: var(--accent-grad); border: none; color: white;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 15px rgba(99, 102, 241, 0.3);
+            background: var(--accent-grad);
+            border: none;
+            color: white;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 15px rgba(99, 102, 241, 0.3);
         }
+
         .primary:hover {
-            transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 25px rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 25px rgba(99, 102, 241, 0.5);
             background: var(--accent-grad-hover);
         }
 
         .secondary-btn {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-main);
-        }
-        .secondary-btn:hover {
-            background: rgba(255,255,255,0.08); border-color: var(--border-highlight);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-main);
         }
 
-        .action-btn { background: #a855f7; border: none; color: white; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 15px rgba(168, 85, 247, 0.3); }
-        .action-btn:hover { background: #9333ea; transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 25px rgba(168, 85, 247, 0.5); }
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-highlight);
+        }
+
+        .action-btn {
+            background: #a855f7;
+            border: none;
+            color: white;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .action-btn:hover {
+            background: #9333ea;
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 25px rgba(168, 85, 247, 0.5);
+        }
 
         /* Interactive Text */
         textarea {
-            width: 100%; background: rgba(0,0,0,0.3); color: var(--text-main);
-            border: 1px solid var(--border); border-radius: var(--radius-md);
-            padding: 1.5rem; font-family: inherit; font-size: 1.15rem; line-height: 1.7;
-            resize: vertical; min-height: 140px; transition: all 0.3s ease;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            font-family: inherit;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            resize: vertical;
+            min-height: 140px;
+            transition: all 0.3s ease;
         }
-        textarea:focus { outline: none; border-color: #6366f1; background: rgba(0,0,0,0.5); box-shadow: inset 0 0 0 1px #6366f1, 0 8px 30px rgba(0,0,0,0.2); }
-        textarea::placeholder { color: var(--text-muted); opacity: 0.5; }
 
-        .text-blurred { color: transparent !important; text-shadow: 0 0 14px rgba(255, 255, 255, 0.7) !important; user-select: none; }
+        textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 0 0 1px #6366f1, 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .text-blurred {
+            color: transparent !important;
+            text-shadow: 0 0 var(--blur-amt, 14px) rgba(255, 255, 255, 0.7) !important;
+            user-select: none;
+        }
 
         .diff-display {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius-md);
-            padding: 1.75rem; font-size: 1.25rem; line-height: 2; min-height: 140px; white-space: pre-wrap;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            font-size: 1.25rem;
+            line-height: 2;
+            min-height: 140px;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
-        .word { display: inline-block; margin-right: 0.25em; margin-bottom: 0.3em; padding: 0 0.15em; border-radius: 6px; transition: all 0.2s ease; }
-        .word.correct { color: var(--success); text-shadow: 0 0 15px rgba(52, 211, 153, 0.2); }
-        .word.incorrect { color: var(--danger); text-decoration: underline wavy rgba(251, 113, 133, 0.6); background: rgba(251, 113, 133, 0.1); }
-        .word.missing { color: var(--text-muted); opacity: 0.4; }
-        .word.visible { color: var(--text-main); opacity: 0.8; }
+        .progress-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899, #6366f1);
+            background-size: 300% 100%;
+            animation: progress-shimmer 3s linear infinite;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(168, 85, 247, 0.2);
+            border-radius: 0 0 4px 4px;
+            z-index: 10;
+        }
+
+        @keyframes progress-shimmer {
+            0% {
+                background-position: 100% 0%;
+            }
+
+            100% {
+                background-position: 0% 0%;
+            }
+        }
+
+        .word {
+            display: inline-block;
+            margin-right: 0.25em;
+            margin-bottom: 0.3em;
+            padding: 0 0.15em;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .word.correct {
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(52, 211, 153, 0.2);
+        }
+
+        .word.incorrect {
+            color: var(--danger);
+            text-decoration: underline wavy rgba(251, 113, 133, 0.6);
+            background: rgba(251, 113, 133, 0.1);
+        }
+
+        .word.missing {
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+
+        .word.visible {
+            color: var(--text-main);
+            opacity: 0.8;
+        }
 
         .reference-text {
-            font-size: 1.15rem; color: var(--text-muted); background: rgba(0,0,0,0.2);
-            padding: 1.5rem; border-radius: var(--radius-md); border-left: 4px solid #a855f7; font-style: italic;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            border-left: 4px solid #a855f7;
+            font-style: italic;
         }
 
         /* Results Display */
         .completion-banner {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
             border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; margin-top: 2rem;
-            backdrop-filter: blur(16px); animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 2rem;
+            backdrop-filter: blur(16px);
+            animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
+
         .completion-banner::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at top, rgba(99, 102, 241, 0.15), transparent 70%); pointer-events: none;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, rgba(99, 102, 241, 0.15), transparent 70%);
+            pointer-events: none;
         }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        
-        .completion-banner h3 { color: var(--text-main); font-size: 1.75rem; margin-bottom: 0.5rem; font-weight: 700; }
-        .text-correct { color: var(--success); font-weight: 600; text-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
-        .text-incorrect { color: var(--danger); font-weight: 600; }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .completion-banner h3 {
+            color: var(--text-main);
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .text-correct {
+            color: var(--success);
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+        }
+
+        .text-incorrect {
+            color: var(--danger);
+            font-weight: 600;
+        }
 
         /* SRS Collection UI */
-        .srs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.25rem; }
+        .srs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.25rem;
+        }
+
         .srs-card {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
-        .srs-card:hover { border-color: rgba(168, 85, 247, 0.4); transform: translateY(-4px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        
-        .srs-card.due { border-color: rgba(99, 102, 241, 0.5); background: rgba(99, 102, 241, 0.08); }
+
+        .srs-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .srs-card.due {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(99, 102, 241, 0.08);
+        }
+
         .srs-card.due::before {
-            content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px;
-            border-radius: var(--radius-md); padding: 1px; background: var(--accent-grad);
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            border-radius: var(--radius-md);
+            padding: 1px;
+            background: var(--accent-grad);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.5; pointer-events: none;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            pointer-events: none;
         }
-        
-        .srs-card p { color: var(--text-main); font-size: 1.05rem; margin-bottom: 1.25rem; line-height: 1.6; }
-        
+
+        .srs-card p {
+            color: var(--text-main);
+            font-size: 1.05rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
         .badge {
-            background: var(--danger); color: white; border-radius: 20px; padding: 0.2rem 0.6rem;
-            font-size: 0.75rem; font-weight: 700; box-shadow: 0 0 10px rgba(251, 113, 133, 0.4);
+            background: var(--danger);
+            color: white;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(251, 113, 133, 0.4);
         }
 
         /* Controls */
         .tts-controls {
-            display: flex; align-items: center; gap: 1.5rem; padding-top: 1.5rem;
-            border-top: 1px solid var(--border); margin-top: auto; flex-wrap: wrap;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+            flex-wrap: wrap;
         }
-        .tts-select {
-            background: rgba(0,0,0,0.4); color: var(--text-main); border: 1px solid var(--border);
-            padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; cursor: pointer;
-        }
-        .tts-select:focus { border-color: #6366f1; outline: none; }
-        .rate-control input[type="range"] { accent-color: #a855f7; width: 100px; }
-        
-        button.speak-btn { background: var(--accent-grad); border: none; color: white; margin-left: auto; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); }
-        button.speak-btn:hover { background: var(--accent-grad-hover); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5); }
-        button.stop-btn { background: rgba(251, 113, 133, 0.15); border: 1px solid rgba(251, 113, 133, 0.3); color: var(--danger); margin-left: auto; }
 
-        .footer { margin-top: 1rem; padding-bottom: 2rem; color: var(--text-muted); font-size: 0.95rem; opacity: 0.6; }
+        .tts-select {
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .tts-select:focus {
+            border-color: #6366f1;
+            outline: none;
+        }
+
+        .rate-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .rate-control label {
+            font-variant-numeric: tabular-nums;
+            min-width: 85px;
+        }
+
+        .rate-control input[type="range"] {
+            accent-color: #a855f7;
+            width: 100px;
+            margin: 0;
+        }
+
+        button.speak-btn {
+            background: var(--accent-grad);
+            border: none;
+            color: white;
+            margin-left: auto;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        button.speak-btn:hover {
+            background: var(--accent-grad-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5);
+        }
+
+        button.stop-btn {
+            background: rgba(251, 113, 133, 0.15);
+            border: 1px solid rgba(251, 113, 133, 0.3);
+            color: var(--danger);
+            margin-left: auto;
+        }
+
+        .footer {
+            margin-top: 1rem;
+            padding-bottom: 2rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            opacity: 0.6;
+        }
 
         /* 
          * ĐIỆN THOẠI (MOBILE RESPONSIVE) 
          */
         @media (max-width: 1024px) {
-            .main-layout { grid-template-columns: 1fr; }
-            .container { padding: 3rem 1.5rem; }
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 3rem 1.5rem;
+            }
         }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2.75rem; }
-            .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .difficulty-stepper { flex-wrap: wrap; gap: 1rem; padding: 1rem; width: 100%; justify-content: space-between; }
-            
-            .panel { padding: 1.5rem; }
-            .panel-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-            .panel-actions { width: 100%; display: flex; flex-wrap: wrap; }
-            .panel-actions button { flex: 1; justify-content: center; } /* stretch buttons full width */
-            
-            header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-            header > div { width: 100%; }
-            header > button { width: 100%; justify-content: center; }
-            
-            .tts-controls { flex-direction: column; align-items: stretch; gap: 1rem; }
-            .tts-controls select { max-width: 100%; }
-            .tts-controls .rate-control { justify-content: space-between; }
-            
-            .srs-grid { grid-template-columns: 1fr; }
+            h1 {
+                font-size: 2.75rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .difficulty-stepper {
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .panel {
+                padding: 1.5rem;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .panel-actions {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .panel-actions button {
+                flex: 1;
+                justify-content: center;
+            }
+
+            /* stretch buttons full width */
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            header>div {
+                width: 100%;
+            }
+
+            header>button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .tts-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .tts-controls select {
+                max-width: 100%;
+            }
+
+            .tts-controls .rate-control {
+                justify-content: space-between;
+            }
+
+            .srs-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
@@ -406,7 +839,7 @@
                 heroSub: "Paste your script, notes, or vocabulary below. Memora transforms it into an uncompromising active testing environment.",
                 heroPlaceholder: "Paste the text you want to memorize here...",
                 openCollection: "Open Knowledge Collection",
-                saved: "saved",
+                saved: "Saved",
                 subtitle: "Enhance your memory through active formatting and recall.",
                 collection: "Collection",
                 collectionTitle: "Your Knowledge Collection",
@@ -422,6 +855,7 @@
                 level: "Level",
                 fullText: "Full Text",
                 blurredText: "Blurred Text",
+                blurLevel: "Blur",
                 hiddenText: "Hidden Text",
                 clozeMode: "Cloze Mode",
                 dictation: "Dictation",
@@ -463,14 +897,16 @@
                 placeholderCloze: "Type the missing words here in order (separated by spaces)...",
                 placeholderRetry: "Type the words you missed (in order)...",
                 placeholderDict: "Listen to the text and type exactly what you hear. Press 'Check Results' when finished...",
-                dueNow: "● Due Now"
+                dueNow: "● Due Now",
+                startPractice: "Start Practice",
+                howToStart: "Click 'Start Practice' to begin your session."
             },
             vi: {
                 heroTitle: "Làm chủ mọi văn bản.",
                 heroSub: "Dán kịch bản, ghi chú hoặc từ vựng của bạn bên dưới. Memora sẽ biến chúng thành môi trường luyện tập phản xạ không khoan nhượng.",
                 heroPlaceholder: "Dán đoạn văn bạn muốn ghi nhớ vào đây...",
                 openCollection: "Mở bộ sưu tập kiến thức",
-                saved: "đã lưu",
+                saved: "Đã Lưu",
                 subtitle: "Tăng cường trí nhớ thông qua định dạng và gợi nhớ chủ động.",
                 collection: "Bộ sưu tập",
                 collectionTitle: "Bộ sưu tập kiến thức của bạn",
@@ -486,6 +922,7 @@
                 level: "Cấp độ",
                 fullText: "Toàn bộ văn bản",
                 blurredText: "Văn bản mờ",
+                blurLevel: "Độ mờ",
                 hiddenText: "Văn bản ẩn",
                 clozeMode: "Chế độ điền khuyết",
                 dictation: "Chính tả",
@@ -527,679 +964,409 @@
                 placeholderCloze: "Gõ các từ còn thiếu tại đây theo thứ tự (cách nhau bằng dấu cách)...",
                 placeholderRetry: "Gõ các từ bạn đã bỏ lỡ (theo thứ tự)...",
                 placeholderDict: "Nghe văn bản và gõ chính xác những gì bạn nghe thấy. Nhấn 'Kiểm tra kết quả' khi hoàn tất...",
-                dueNow: "● Đến hạn ngay"
+                dueNow: "● Đến hạn ngay",
+                startPractice: "Bắt đầu luyện tập",
+                howToStart: "Nhấn 'Bắt đầu luyện tập' để bắt đầu buổi tập."
             }
         };
 
-        function App() {
-            const [lang, setLang] = useState(localStorage.getItem('memora-lang') || 'en');
-            const t = translations[lang];
+        // --- CUSTOM HOOKS ---
+        function useSRS() {
+            const [srsData, setSrsData] = useState(() => JSON.parse(localStorage.getItem('memora-srs') || '{}'));
 
-            const [originalText, setOriginalText] = useState("");
-            const [userInput, setUserInput] = useState("");
-            const [isChecked, setIsChecked] = useState(false);
-            const [difficulty, setDifficulty] = useState(1);
-            const [isRetry, setIsRetry] = useState(false);
-            const [clozeIndices, setClozeIndices] = useState(new Set());
-            const [showReviewQueue, setShowReviewQueue] = useState(false);
-
-            useEffect(() => {
-                localStorage.setItem('memora-lang', lang);
-            }, [lang]);
-
-            // Toggles hiding original text directly, true = manual hide, false = manual show, null = rely on mode
-            const [manualIsHidden, setManualIsHidden] = useState(null);
-
-            const activeMode = isRetry ? "retry" : (difficulty === 4 ? "cloze" : difficulty === 5 ? "dictation" : "full");
-            
-            // Visibility logic seamlessly overriden when valid
-            const isRefHidden = isRetry ? false : (manualIsHidden !== null ? manualIsHidden : (difficulty >= 3 || difficulty === 5));
-            const isRefBlurred = (manualIsHidden === null && !isRetry) && (difficulty === 2);
-
-            const toggleRefVisibility = () => {
-                if (manualIsHidden !== null) {
-                    setManualIsHidden(!manualIsHidden);
-                } else {
-                    const defaultHidden = (difficulty >= 3 || difficulty === 5);
-                    setManualIsHidden(!defaultHidden); // Toggle explicitly against the background default
-                }
+            const saveSRSItem = (text, accuracy) => {
+                const now = Date.now();
+                const current = srsData[text] || { count: 0, lastAccuracy: 0 };
+                // SRS Logic: 100% -> 24h, >80% -> 10m, else -> 1m
+                const delay = accuracy === 100 ? 86400000 : (accuracy > 80 ? 600000 : 60000);
+                const newData = { ...srsData, [text]: { text, accuracy, lastReviewed: now, nextReview: now + delay } };
+                setSrsData(newData);
+                localStorage.setItem('memora-srs', JSON.stringify(newData));
             };
 
-            // TTS State
+            const deleteSRSItem = (text) => {
+                const newData = { ...srsData };
+                delete newData[text];
+                setSrsData(newData);
+                localStorage.setItem('memora-srs', JSON.stringify(newData));
+            };
+
+            const sorted = Object.values(srsData).sort((a, b) => a.nextReview - b.nextReview);
+            const dueItems = sorted.filter(i => i.nextReview <= Date.now());
+            const pendingItems = sorted.filter(i => i.nextReview > Date.now());
+
+            return { srsData, dueItems, pendingItems, deleteSRSItem, saveSRSItem };
+        }
+
+        function useTTS(text) {
             const [voices, setVoices] = useState([]);
             const [selectedVoiceURI, setSelectedVoiceURI] = useState("");
-            const [rate, setRate] = useState(1);
+            const [rate, setRate] = useState(1.0);
             const [isSpeaking, setIsSpeaking] = useState(false);
             const [isPaused, setIsPaused] = useState(false);
 
-            // SRS Storage State
-            const [srsData, setSrsData] = useState({});
-
-            const loadSRSDetails = () => {
-                setSrsData(JSON.parse(localStorage.getItem('memora-srs') || '{}'));
-            };
-
-            useEffect(() => {
-                loadSRSDetails();
-                const interval = setInterval(loadSRSDetails, 60000); // refresh due items every minute
-                return () => clearInterval(interval);
-            }, []);
-
-            const dueItems = Object.values(srsData).filter(item => Date.now() >= item.nextReview);
-            const pendingItems = Object.values(srsData).filter(item => Date.now() < item.nextReview).sort((a,b) => a.nextReview - b.nextReview);
-
-            // Fetch TTS voices
             useEffect(() => {
                 const updateVoices = () => {
-                    const availableVoices = window.speechSynthesis.getVoices();
-                    setVoices(availableVoices);
-                    
-                    if (availableVoices.length > 0 && !selectedVoiceURI) {
-                        let bestVoice = availableVoices.find(v => v.lang.includes('en-US') && v.name.includes('Natural'));
-                        if (!bestVoice) bestVoice = availableVoices.find(v => v.lang.startsWith('en') && v.name.includes('Natural'));
-                        if (!bestVoice) bestVoice = availableVoices.find(v => v.name === 'Google US English');
-                        if (!bestVoice) bestVoice = availableVoices.find(v => v.lang === 'en-US' && v.name.includes('Siri'));
-                        if (!bestVoice) bestVoice = availableVoices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
-                        if (!bestVoice) bestVoice = availableVoices.find(v => v.lang.startsWith('en')) || availableVoices[0];
-                        
-                        if (bestVoice) {
-                            setSelectedVoiceURI(bestVoice.voiceURI);
-                        }
+                    const v = window.speechSynthesis.getVoices();
+                    setVoices(v);
+                    if (v.length && !selectedVoiceURI) {
+                        const preferred = v.find(voice => voice.name.includes("Natural") || voice.name.includes("Google")) || v[0];
+                        setSelectedVoiceURI(preferred.voiceURI);
                     }
                 };
-                
                 updateVoices();
-                if (window.speechSynthesis.onvoiceschanged !== undefined) {
-                    window.speechSynthesis.onvoiceschanged = updateVoices;
-                }
-                
-                return () => window.speechSynthesis.cancel();
+                window.speechSynthesis.onvoiceschanged = updateVoices;
             }, []);
 
-            // Generate Cloze Indices automatically if difficulty 4 is hit
-            useEffect(() => {
-                if (activeMode === 'cloze' && originalText.trim() && !isRetry) {
-                    const words = originalText.trim().split(/\s+/);
-                    const targetCount = Math.max(1, Math.floor(words.length * 0.3)); // 30%
-                    let candidates = words.map((w, i) => ({ index: i, length: w.replace(/[^a-zA-Z0-9]/g, '').length }));
-                    
-                    for (let i = candidates.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-                    }
-                    candidates.sort((a, b) => b.length - a.length);
-                    setClozeIndices(new Set(candidates.slice(0, targetCount).map(c => c.index)));
-                } else if (!isRetry) {
-                    setClozeIndices(new Set());
-                }
-            }, [activeMode, originalText, isRetry]);
-
-            const handlePlayPause = () => {
-                if (!originalText) return;
-                if (isSpeaking) {
-                    if (isPaused) {
-                        window.speechSynthesis.resume();
-                        setIsPaused(false);
-                    } else {
-                        window.speechSynthesis.pause();
-                        setIsPaused(true);
-                    }
-                } else {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(originalText);
-                    if (selectedVoiceURI) {
-                        const voice = voices.find(v => v.voiceURI === selectedVoiceURI);
-                        if (voice) utterance.voice = voice;
-                    }
-                    utterance.rate = rate;
-                    utterance.onstart = () => { setIsSpeaking(true); setIsPaused(false); };
-                    utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); };
-                    utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); };
-                    window.speechSynthesis.speak(utterance);
-                }
+            const play = () => {
+                window.speechSynthesis.cancel();
+                const ut = new SpeechSynthesisUtterance(text);
+                const voice = voices.find(v => v.voiceURI === selectedVoiceURI);
+                if (voice) ut.voice = voice;
+                ut.rate = rate;
+                ut.onstart = () => { setIsSpeaking(true); setIsPaused(false); };
+                ut.onend = () => { setIsSpeaking(false); setIsPaused(false); };
+                window.speechSynthesis.speak(ut);
             };
 
-            const handleReplay = () => {
-                if (!originalText) return;
-                window.speechSynthesis.cancel();
-                setIsSpeaking(false);
-                setIsPaused(false);
-                setTimeout(() => {
-                    const utterance = new SpeechSynthesisUtterance(originalText);
-                    if (selectedVoiceURI) {
-                        const voice = voices.find(v => v.voiceURI === selectedVoiceURI);
-                        if (voice) utterance.voice = voice;
-                    }
-                    utterance.rate = rate;
-                    utterance.onstart = () => { setIsSpeaking(true); setIsPaused(false); };
-                    utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); };
-                    utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); };
-                    window.speechSynthesis.speak(utterance);
-                }, 50);
-            };
+            const pause = () => { window.speechSynthesis.pause(); setIsPaused(true); };
+            const resume = () => { window.speechSynthesis.resume(); setIsPaused(false); };
+            const stop = () => { window.speechSynthesis.cancel(); setIsSpeaking(false); setIsPaused(false); };
+
+            return { voices, selectedVoiceURI, setSelectedVoiceURI, rate, setRate, isSpeaking, isPaused, play, pause, resume, stop };
+        }
+
+        function useRecallLogic(originalText) {
+            const [difficulty, setDifficulty] = useState(1);
+            const [userInput, setUserInput] = useState("");
+            const [isStarted, setIsStarted] = useState(false);
+            const [isChecked, setIsChecked] = useState(false);
+            const [isRetry, setIsRetry] = useState(false);
+            const [manualIsHidden, setManualIsHidden] = useState(null);
+            const [clozeIndices, setClozeIndices] = useState(new Set());
 
             useEffect(() => {
-                window.speechSynthesis.cancel();
-                setIsSpeaking(false);
-                setIsPaused(false);
-            }, [originalText, activeMode]);
+                if (difficulty === 4 && !isRetry) {
+                    const words = originalText.trim().split(/\s+/).filter(w => w);
+                    const indices = new Set();
+                    const numCloze = Math.max(1, Math.floor(words.length * 0.3)); // 30% blanked out
+                    while (indices.size < numCloze && indices.size < words.length) {
+                        indices.add(Math.floor(Math.random() * words.length));
+                    }
+                    setClozeIndices(indices);
+                }
+            }, [difficulty, isRetry, originalText]);
 
-            const originalWords = useMemo(() => {
-                const text = originalText.trim();
-                return text ? text.split(/\s+/) : [];
-            }, [originalText]);
+            const activeMode = isRetry ? 'retry' : (difficulty === 4 ? 'cloze' : (difficulty === 5 ? 'dictation' : 'full'));
 
-            const userWords = useMemo(() => {
-                const text = userInput.trim();
-                return text ? text.split(/\s+/) : [];
-            }, [userInput]);
+            const targetWords = useMemo(() => {
+                const words = originalText.trim().split(/\s+/).filter(w => w);
+                if (activeMode === 'cloze' || activeMode === 'retry') {
+                    return words.filter((_, i) => clozeIndices.has(i));
+                }
+                return words;
+            }, [originalText, activeMode, clozeIndices]);
 
-            // Core Diff Logic
+            const userWords = useMemo(() => userInput.trim().split(/\s+/).filter(w => w), [userInput]);
+
             const comparison = useMemo(() => {
-                let hiddenIdx = 0;
-                const isClozeLike = activeMode === "cloze" || activeMode === "retry";
-                
-                return originalWords.map((word, index) => {
-                    const isMissingMode = isClozeLike && !clozeIndices.has(index);
-                    if (isMissingMode) {
-                        return { word, displayWord: word, status: "visible", index };
+                const words = originalText.trim().split(/\s+/).filter(w => w);
+                return words.map((target, idx) => {
+                    if (activeMode === 'cloze' || activeMode === 'retry') {
+                        if (!clozeIndices.has(idx)) return { word: target, displayWord: target, status: 'visible', index: idx };
+                        const clozeIdx = Array.from(clozeIndices).sort((a, b) => a - b).indexOf(idx);
+                        const userTyped = userWords[clozeIdx] || "";
+                        const status = isChecked ? (userTyped.toLowerCase() === target.toLowerCase() ? 'correct' : 'incorrect') : 'missing';
+                        return { word: target, displayWord: isChecked ? (userTyped || "___") : "___", status, index: idx };
                     }
-                    
-                    let status = "missing";
-                    const compareIndex = isClozeLike ? hiddenIdx : index;
-                    if (compareIndex < userWords.length) {
-                        status = (userWords[compareIndex] === word) ? "correct" : "incorrect";
-                    }
-                    if (isClozeLike) hiddenIdx++;
-                    
-                    let displayWord = word;
-                    if (status === "missing") {
-                        if (isClozeLike) displayWord = "____";
-                        else if (activeMode === "dictation") displayWord = "";
-                    }
-                    return { word, displayWord, status, index };
+                    const userTyped = userWords[idx] || "";
+                    const status = isChecked ? (userTyped.toLowerCase() === target.toLowerCase() ? 'correct' : 'incorrect') : 'missing';
+                    return { word: target, displayWord: isChecked ? (userTyped || target) : target, status, index: idx };
                 });
-            }, [originalWords, userWords, activeMode, clozeIndices]);
+            }, [originalText, userWords, isChecked, activeMode, clozeIndices]);
 
-            // Metrics
-            const targetWordsCount = (activeMode === "cloze" || activeMode === "retry") ? clozeIndices.size : originalWords.length;
-            const correctWordsCount = comparison.filter(w => w.status === "correct").length;
-            const accuracy = targetWordsCount === 0 ? 0 : Math.round((correctWordsCount / targetWordsCount) * 100);
-            
-            const isFinished = originalWords.length > 0 && targetWordsCount > 0 && userWords.length >= targetWordsCount;
-            const canCheck = (activeMode === "full" || activeMode === "dictation") && userInput.trim().length > 0;
+            const accuracy = useMemo(() => {
+                if (!targetWords.length) return 0;
+                const correct = comparison.filter(item => (activeMode === 'cloze' || activeMode === 'retry' ? clozeIndices.has(item.index) : true) && item.status === 'correct').length;
+                return Math.round((correct / targetWords.length) * 100);
+            }, [comparison, targetWords, activeMode, clozeIndices]);
 
-            // Spaced Repetition Persistance Hooks
-            useEffect(() => {
-                if (isChecked && !isRetry && originalText.trim().length > 0) {
-                    const data = JSON.parse(localStorage.getItem('memora-srs') || '{}');
-                    let delay = 60 * 1000;
-                    if (accuracy > 90) delay = 24 * 60 * 60 * 1000;
-                    else if (accuracy > 60) delay = 10 * 60 * 1000;
-                    
-                    data[originalText] = {
-                        text: originalText,
-                        accuracy: accuracy,
-                        lastReviewed: Date.now(),
-                        nextReview: Date.now() + delay
-                    };
-                    localStorage.setItem('memora-srs', JSON.stringify(data));
-                    loadSRSDetails();
-                }
-            }, [isChecked, isRetry, originalText, accuracy]);
-
-            const deleteSRSItem = (text) => {
-                if (window.confirm("Remove this text from your collection permanently?")) {
-                    const data = JSON.parse(localStorage.getItem('memora-srs') || '{}');
-                    delete data[text];
-                    localStorage.setItem('memora-srs', JSON.stringify(data));
-                    loadSRSDetails();
-                }
+            return {
+                difficulty, setDifficulty,
+                userInput, setUserInput,
+                isStarted, setIsStarted,
+                isChecked, setIsChecked,
+                isRetry, setIsRetry,
+                manualIsHidden, setManualIsHidden,
+                clozeIndices, setClozeIndices,
+                activeMode, targetWords, userWords, comparison, accuracy,
+                canCheck: userWords.length > 0 && !isChecked
             };
-            
-            const startReview = (text) => {
-                setOriginalText(text);
-                setUserInput("");
-                setIsRetry(false);
-                setManualIsHidden(null);
-                setShowReviewQueue(false);
-            };
+        }
 
-            const formatTime = (ms) => {
-                const mins = Math.max(1, Math.round(ms / 60000));
-                if (mins < 60) return `${mins} min${mins !== 1 ? 's' : ''}`;
-                const hours = Math.round(mins / 60);
-                if (hours < 24) return `${hours} hr${hours !== 1 ? 's' : ''}`;
-                const days = Math.round(hours / 24);
-                return `${days} day${days !== 1 ? 's' : ''}`;
-            };
-
-            const handleNextRound = () => {
-                let nextDifficulty = difficulty;
-                if (accuracy > 90) nextDifficulty = Math.min(5, difficulty + 1);
-                else if (accuracy < 60) nextDifficulty = Math.max(1, difficulty - 1);
-                
-                setDifficulty(nextDifficulty);
-                setUserInput("");
-                setIsRetry(false);
-                setIsChecked(false);
-                setManualIsHidden(null);
-            };
-
-            const handleRetryMistakes = () => {
-                const mistakes = new Set();
-                comparison.forEach(item => {
-                    if (item.status === 'incorrect' || item.status === 'missing') {
-                        mistakes.add(item.index);
-                    }
-                });
-                if (mistakes.size === 0) {
-                    window.alert("Perfect! There are no mistakes to retry.");
-                    return;
-                }
-                setClozeIndices(mistakes);
-                setIsRetry(true);
-                setUserInput("");
-                setManualIsHidden(false); // Default to showing context during retry
-            };
-
-            const handleReset = () => {
-                if (userInput === "" && !isRetry) return;
-                setUserInput("");
-                setIsRetry(false);
-                setIsChecked(false);
-            };
-
-            const handleClearAll = () => {
-                setOriginalText("");
-                setUserInput("");
-                setIsRetry(false);
-                setIsChecked(false);
-                setManualIsHidden(null);
-                setDifficulty(1);
-            };
-
+        // --- SUB-COMPONENTS ---
+        function Header({ lang, setLang, t, onOpenCollection, collectionCount }) {
             return (
-                <div className="container">
-                    <header>
-                        <div>
-                            <h1 onClick={handleClearAll}>Memora</h1>
-                            <p className="subtitle">{t.subtitle}</p>
-                        </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <button 
-                                onClick={() => setLang(lang === 'en' ? 'vi' : 'en')}
-                                className="secondary-btn"
-                                style={{ borderRadius: '20px', padding: '0.4rem 1rem' }}
-                            >
-                                {lang === 'en' ? '🇻🇳 Tiếng Việt' : '🇺🇸 English'}
-                            </button>
-                            <button 
-                                onClick={() => setShowReviewQueue(!showReviewQueue)} 
-                                className={showReviewQueue ? "primary" : "secondary-btn"} 
-                                style={{ position: "relative", whiteSpace: "nowrap" }}
-                            >
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                                {t.collection}
-                                {dueItems.length > 0 && !showReviewQueue && (
-                                    <span className="badge" style={{ position: "absolute", top: -8, right: -8 }}>
-                                        {dueItems.length}
-                                    </span>
-                                )}
-                            </button>
-                        </div>
-                    </header>
-
-                    {showReviewQueue ? (
-                        <div className="panel review-queue-panel" style={{ animation: "slideUp 0.4s ease" }}>
-                            <div className="panel-header">
-                                <div className="panel-title">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                                    {t.collectionTitle}
-                                </div>
-                                <div className="panel-actions">
-                                    <button onClick={() => setShowReviewQueue(false)} className="secondary-btn">
-                                        {t.backToPractice}
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginTop: '1rem' }}>
-                                <div>
-                                    <h3 style={{ marginBottom: '1rem', color: "var(--danger)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                        {t.dueForReview}
-                                        <span className="badge">{dueItems.length}</span>
-                                    </h3>
-                                    {dueItems.length === 0 && <p style={{ color: "var(--text-muted)", fontStyle: "italic" }}>{t.allCaughtUp}</p>}
-                                    <div className="srs-grid">
-                                        {dueItems.map(item => (
-                                            <div key={item.text} className="srs-card due">
-                                                <p>{item.text.length > 100 ? item.text.substring(0, 100) + "..." : item.text}</p>
-                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
-                                                    <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                                                        <span style={{ color: "var(--danger)", fontWeight: "700" }}>{t.dueNow}</span>
-                                                        <span>{t.accuracy}: <strong style={{color: "var(--text-main)"}}>{item.accuracy}%</strong></span>
-                                                    </div>
-                                                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                                                        <button onClick={() => deleteSRSItem(item.text)} className="secondary-btn" title="Remove" style={{ padding: "0.4rem" }}>
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                        </button>
-                                                        <button onClick={() => startReview(item.text)} className="primary" style={{ padding: "0.4rem 1.25rem" }}>{t.review}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h3 style={{ marginBottom: '1rem', color: "var(--text-main)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                        {t.upcoming} 
-                                        <span className="badge" style={{background: "var(--border-highlight)", color: "var(--text-main)", boxShadow: "none"}}>{pendingItems.length}</span>
-                                    </h3>
-                                    {pendingItems.length === 0 && dueItems.length === 0 && <p style={{ color: "var(--text-muted)", fontStyle: "italic" }}>{t.finishToSave}</p>}
-                                    <div className="srs-grid">
-                                        {pendingItems.map(item => (
-                                            <div key={item.text} className="srs-card">
-                                                <p style={{ color: "var(--text-muted)" }}>{item.text.length > 100 ? item.text.substring(0, 100) + "..." : item.text}</p>
-                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
-                                                    <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                                                        <span>Due in <strong>{formatTime(item.nextReview - Date.now())}</strong></span>
-                                                        <span>{t.accuracy}: <strong style={{color: "var(--text-main)"}}>{item.accuracy}%</strong></span>
-                                                    </div>
-                                                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                                                        <button onClick={() => deleteSRSItem(item.text)} className="secondary-btn" title="Remove" style={{ padding: "0.4rem", borderColor: "transparent" }}>
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                        </button>
-                                                        <button onClick={() => startReview(item.text)} className="secondary-btn" style={{ padding: "0.4rem 1rem" }}>{t.practiceEarly}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ) : !originalText ? (
-                        <div style={{ maxWidth: '800px', margin: '4rem auto', width: '100%', textAlign: 'center', animation: 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                            <div className="panel" style={{ padding: '4rem 3rem', background: 'var(--surface)', boxShadow: '0 20px 50px rgba(0,0,0,0.4)' }}>
-                                <h2 style={{ fontSize: '2.75rem', marginBottom: '1rem', fontWeight: 800, color: 'transparent', background: 'var(--accent-grad)', WebkitBackgroundClip: 'text', letterSpacing: '-0.03em' }}>
-                                    {t.heroTitle}
-                                </h2>
-                                <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '2.5rem', lineHeight: '1.6' }}>
-                                    {t.heroSub}
-                                </p>
-                                <textarea 
-                                    placeholder={t.heroPlaceholder}
-                                    value={originalText}
-                                    onChange={(e) => setOriginalText(e.target.value)}
-                                    spellCheck="false"
-                                    style={{ minHeight: '220px', fontSize: '1.2rem', boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.2)' }}
-                                />
-                            </div>
-                            
-                            {(pendingItems.length > 0 || dueItems.length > 0) && (
-                                <button onClick={() => setShowReviewQueue(true)} className="secondary-btn" style={{ marginTop: '2.5rem', padding: '1rem 2rem', borderRadius: '30px', fontSize: '1.05rem' }}>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                                    {t.openCollection} ({pendingItems.length + dueItems.length} {t.saved})
-                                </button>
-                            )}
-                        </div>
-                    ) : ( 
-                        <>
-                            <div className="dashboard-top">
-                                <div className="difficulty-stepper" style={{ height: '100%' }}>
-                                <button onClick={() => {setDifficulty(d => Math.max(1, d - 1)); setIsRetry(false); setUserInput(""); setManualIsHidden(null);}}>
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                                </button>
-                                <div className="level-info">
-                                    <span className="level-badge">{isRetry ? t.targetedPractice : `${t.level} ${difficulty}`}</span>
-                                    <span className="level-name">
-                                        {isRetry ? t.retryMode :
-                                         difficulty === 1 ? t.fullText :
-                                         difficulty === 2 ? t.blurredText :
-                                         difficulty === 3 ? t.hiddenText :
-                                         difficulty === 4 ? t.clozeMode :
-                                         t.dictation}
-                                    </span>
-                                </div>
-                                <button onClick={() => {setDifficulty(d => Math.min(5, d + 1)); setIsRetry(false); setUserInput(""); setManualIsHidden(null);}}>
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </button>
-                            </div>
-
-                            <div className="stats-grid">
-                                <div className="stat-card active-stat">
-                                    <div className="stat-value val-acc">{accuracy}%</div>
-                                    <div className="stat-label">{t.accuracy}</div>
-                                </div>
-                                <div className="stat-card correct-stat">
-                                    <div className="stat-value val-cor">{correctWordsCount}</div>
-                                    <div className="stat-label">{t.correctWords}</div>
-                                </div>
-                                <div className="stat-card">
-                                    <div className="stat-value val-tot">{targetWordsCount}</div>
-                                    <div className="stat-label">{t.targetWords}</div>
-                                </div>
-                            </div>
-                            </div>
-
-                            <div className={`main-layout ${!originalText ? 'single-col' : ''}`}>
-                                {/* LEFT COLUMN: Reference / Input Area */}
-                                <div className="panel">
-                                    <div className="panel-header">
-                                        <div className="panel-title">
-                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                            {t.referenceText}
-                                        </div>
-                                        <div className="panel-actions">
-                                            {originalText && (
-                                                <button onClick={toggleRefVisibility} className="secondary-btn">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        {isRefHidden ? (
-                                                            <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></>
-                                                        ) : (
-                                                            <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></>
-                                                        )}
-                                                    </svg>
-                                                    {isRefHidden ? t.showText : t.hideText}
-                                                </button>
-                                            )}
-                                            {originalText && (
-                                                <button onClick={handleClearAll} style={{color: "var(--danger)", borderColor: "transparent", background: "transparent"}}>
-                                                    {t.clear}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    
-                                    {!isRefHidden ? (
-                                        <textarea 
-                                            className={isRefBlurred ? "text-blurred" : ""}
-                                            placeholder="Paste the paragraph you want to memorize here..."
-                                            value={originalText}
-                                            onChange={(e) => setOriginalText(e.target.value)}
-                                            spellCheck="false"
-                                        />
-                                    ) : (
-                                        <div className="reference-text">
-                                            {difficulty === 5 
-                                                ? "Text is completely hidden for Dictation. Listen to the audio and type." 
-                                                : "Reference text is hidden. You can click 'Show Text' to view it manually."}
-                                        </div>
-                                    )}
-
-                                    {originalText && (
-                                        <div className="tts-controls">
-                                            <select 
-                                                value={selectedVoiceURI} 
-                                                onChange={(e) => setSelectedVoiceURI(e.target.value)}
-                                                className="tts-select"
-                                                title={t.voiceLang}
-                                            >
-                                                {voices.map((v) => (
-                                                    <option key={v.voiceURI} value={v.voiceURI}>
-                                                        {v.name} ({v.lang})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            
-                                            <div className="rate-control" title={t.speed}>
-                                                <label>{t.speed}: {rate}x</label>
-                                                <input 
-                                                    type="range" 
-                                                    min="0.5" max="2" step="0.1" 
-                                                    value={rate} 
-                                                    onChange={(e) => setRate(parseFloat(e.target.value))}
-                                                />
-                                            </div>
-                                            
-                                            <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem" }}>
-                                                {(activeMode === "dictation" || isSpeaking) && (
-                                                    <button onClick={handleReplay} className="secondary-btn" title="Restart Audio">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38l5.67-1.74"></path></svg>
-                                                    </button>
-                                                )}
-                                                <button onClick={handlePlayPause} className={isSpeaking && !isPaused ? "stop-btn" : "speak-btn"}>
-                                                    {isSpeaking && !isPaused ? (
-                                                        <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> {t.pause}</>
-                                                    ) : (
-                                                        <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg> {isPaused ? t.resume : t.play}</>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* RIGHT COLUMN: Action / Feedback Area */}
-                                {originalText && (
-                                    <div className="panel" style={{ animation: "fadeIn 0.5s ease" }}>
-                                        <div className="panel-header">
-                                            <div className="panel-title">
-                                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                                {isRetry ? t.targetedPractice : t.practiceArea}
-                                            </div>
-                                            <div className="panel-actions">
-                                                {!isChecked && !isRetry && userInput.trim() !== "" && (
-                                                    <button onClick={handleRetryMistakes} className="action-btn">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                                                        {t.retryMistakes}
-                                                    </button>
-                                                )}
-                                                <button onClick={handleReset} className="secondary-btn">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
-                                                    {t.restart}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <textarea
-                                            placeholder={
-                                                activeMode === "full" ? t.placeholderFull :
-                                                activeMode === "cloze" ? t.placeholderCloze :
-                                                activeMode === "retry" ? t.placeholderRetry :
-                                                t.placeholderDict
-                                            }
-                                            value={userInput}
-                                            onChange={(e) => setUserInput(e.target.value)}
-                                            style={{ minHeight: isChecked ? '130px' : '300px' }}
-                                            spellCheck="false"
-                                            disabled={isChecked}
-                                        />
-
-                                        {!isChecked && canCheck && (
-                                            <button 
-                                                onClick={() => setIsChecked(true)} 
-                                                className="primary" 
-                                                style={{ width: '100%', padding: '1.25rem', fontSize: '1.25rem', marginTop: '1.5rem', fontWeight: 'bold', boxShadow: '0 10px 20px -5px var(--accent-glow)' }}
-                                            >
-                                                {t.checkBtn}
-                                            </button>
-                                        )}
-                                        
-                                        {(isChecked || activeMode === "cloze" || activeMode === "retry") && (
-                                            <div style={{ marginTop: '1.5rem', animation: 'fadeIn 0.5s ease' }}>
-                                                <div className="panel-title" style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '6px'}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                                    {isChecked ? t.assessmentResults : t.fillBlanks}
-                                                </div>
-                                                <div className="diff-display">
-                                                    {comparison.filter(item => item.displayWord !== "").map((item) => (
-                                                        <span key={item.index} className={`word ${item.status}`}>
-                                                            {item.displayWord}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                        
-                                        {isChecked && !isRetry && (
-                                            <div className="completion-banner">
-                                                <h3>{t.roundComplete}</h3>
-                                                <p style={{ fontSize: "1.2rem", margin: "0.5rem 0", color: "var(--text-muted)" }}>{t.finalAccuracy}: <strong style={{color: "var(--text-main)"}}>{accuracy}%</strong></p>
-                                                
-                                                {accuracy >= 90 ? <p className="text-correct">{t.excellent}</p> : 
-                                                 accuracy < 60 ? <p className="text-incorrect">{t.needsReview}</p> : 
-                                                 <p style={{ color: "var(--text-muted)" }}>{t.solid}</p>}
-                                                 
-                                                <div className="panel-actions" style={{ justifyContent: "center", marginTop: "1.5rem" }}>
-                                                    <button onClick={handleNextRound} className="primary" style={{ padding: "0.8rem 1.5rem" }}>
-                                                        {accuracy > 90 && difficulty < 5 ? `${t.advanceTo} ${difficulty + 1}` :
-                                                         accuracy < 60 && difficulty > 1 ? `${t.dropTo} ${difficulty - 1}` :
-                                                         `${t.retryLevel} ${difficulty}`}
-                                                    </button>
-                                                    {accuracy < 100 && (
-                                                        <button onClick={handleRetryMistakes} className="secondary-btn" style={{ borderColor: "var(--accent-glow)" }}>
-                                                            {t.fixMistakesFirst}
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {isChecked && isRetry && (
-                                            <div className="completion-banner" style={{ background: "rgba(52, 211, 153, 0.05)", borderColor: "rgba(52, 211, 153, 0.3)" }}>
-                                                <h3 style={{ color: "var(--success)" }}>{t.retryComplete}</h3>
-                                                <p style={{ fontSize: "1.2rem", margin: "0.5rem 0", color: "var(--text-muted)" }}>{t.finalAccuracy}: <strong style={{color: "var(--text-main)"}}>{accuracy}%</strong></p>
-                                                
-                                                {accuracy === 100 ? (
-                                                    <p className="text-correct">{t.flawless}</p>
-                                                ) : (
-                                                    <p className="text-incorrect">{t.almost}</p>
-                                                )}
-                                                 
-                                                <div className="panel-actions" style={{ justifyContent: "center", marginTop: "1.5rem" }}>
-                                                    {accuracy === 100 ? (
-                                                        <button onClick={() => { setIsRetry(false); setUserInput(""); setIsChecked(false); }} className="primary" style={{ padding: "0.8rem 1.5rem" }}>
-                                                            {t.resumeLevel} {difficulty}
-                                                        </button>
-                                                    ) : (
-                                                        <button onClick={handleRetryMistakes} className="action-btn">
-                                                            {t.targetRemaining}
-                                                        </button>
-                                                    )}
-                                                    <button onClick={() => { setIsRetry(false); setUserInput(""); setIsChecked(false); }} className="secondary-btn">
-                                                        {t.cancelRetry}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    )}
-                    
-                    <div className="footer">
-                        {t.footer}
+                <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', padding: '1rem 0', borderBottom: '1px solid var(--border)' }}>
+                    <h1 onClick={() => window.location.reload()} style={{ cursor: 'pointer', margin: 0, fontSize: '2rem', background: 'var(--accent-grad)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>Memora</h1>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <button onClick={onOpenCollection} className="secondary-btn" style={{ borderRadius: '20px' }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            {t.saved} {collectionCount > 0 && `(${collectionCount})`}
+                        </button>
+                        <button onClick={() => setLang(lang === 'en' ? 'vi' : 'en')} className="secondary-btn" style={{ borderRadius: '20px' }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            {lang === 'en' ? 'Tiếng Việt' : 'English'}
+                        </button>
                     </div>
                 </div>
             );
         }
 
+        function HomeView({ t, originalText, setOriginalText, onStart, hasCollection, onOpenCollection, collectionCount }) {
+            return (
+                <div className="hero-section" style={{ textAlign: 'center', padding: '4rem 0' }}>
+                    <span className="badge-premium" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1.5rem', display: 'inline-block' }}>{t.targetedPractice}</span>
+                    <h2 style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1rem', letterSpacing: '-0.04em' }}>{t.heroTitle}</h2>
+                    <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', maxWidth: '700px', margin: '0 auto 3rem' }}>{t.heroSub}</p>
+
+                    <div className="panel" style={{ maxWidth: '900px', margin: '0 auto', padding: '2.5rem' }}>
+                        <textarea
+                            placeholder={t.heroPlaceholder}
+                            value={originalText}
+                            onChange={(e) => setOriginalText(e.target.value)}
+                            style={{ minHeight: '200px', fontSize: '1.25rem', border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-main)', resize: 'none' }}
+                        />
+                        {originalText.trim() && (
+                            <button onClick={onStart} className="primary" style={{ width: '100%', padding: '1.25rem', fontSize: '1.2rem', marginTop: '1.5rem', borderRadius: '15px' }}>
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                {t.startPractice}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function Dashboard({ t, recall }) {
+            const handlePrev = () => { recall.setDifficulty(d => Math.max(1, d - 1)); recall.setIsRetry(false); recall.setUserInput(""); recall.setManualIsHidden(null); recall.setIsChecked(false); };
+            const handleNext = () => { recall.setDifficulty(d => Math.min(5, d + 1)); recall.setIsRetry(false); recall.setUserInput(""); recall.setManualIsHidden(null); recall.setIsChecked(false); };
+
+            return (
+                <div className="dashboard-top">
+                    <div className="difficulty-stepper">
+                        <button onClick={handlePrev} className="secondary-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                        <div className="level-info">
+                            <span className="level-badge">{recall.isRetry ? t.targetedPractice : `${t.level} ${recall.difficulty}`}</span>
+                            <span className="level-name">
+                                {recall.isRetry ? t.retryMode :
+                                    recall.difficulty === 1 ? t.fullText :
+                                        recall.difficulty === 2 ? t.blurredText :
+                                            recall.difficulty === 3 ? t.hiddenText :
+                                                recall.difficulty === 4 ? t.clozeMode : t.dictation}
+                            </span>
+                        </div>
+                        <button onClick={handleNext} className="secondary-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                    </div>
+                    <div className="stats-grid">
+                        <div className="stat-card active-stat">
+                            <div className="stat-value val-acc">{recall.accuracy}%</div>
+                            <div className="stat-label">{t.accuracy}</div>
+                        </div>
+                        <div className="stat-card correct-stat">
+                            <div className="stat-value val-cor">{recall.userWords.length}</div>
+                            <div className="stat-label">{t.correctWords}</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value val-tot">{recall.targetWords.length}</div>
+                            <div className="stat-label">{t.targetWords}</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function CollectionModal({ t, dueItems, pendingItems, onStartReview, onDelete, onClose }) {
+            const formatTime = (ms) => {
+                const mins = Math.max(1, Math.round(ms / 60000));
+                if (mins < 60) return `${mins}m`;
+                const hours = Math.round(mins / 60);
+                if (hours < 24) return `${hours}h`;
+                return `${Math.round(hours / 24)}d`;
+            };
+
+            return (
+                <div className="review-queue-overlay" onClick={onClose} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div className="panel" onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="panel-header" style={{ marginBottom: '1.5rem' }}>
+                            <div className="panel-title" style={{ fontSize: '1.5rem' }}>{t.collectionTitle}</div>
+                            <button onClick={onClose} className="secondary-btn" style={{ borderRadius: '50%', padding: '0.5rem' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {dueItems.length === 0 && pendingItems.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>{t.finishToSave}</div>
+                            ) : (
+                                <>
+                                    {dueItems.map(item => (
+                                        <div key={item.text} className="srs-card due" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{ margin: 0 }}>{item.text.substring(0, 100)}...</p>
+                                                <small style={{ color: 'var(--danger)', fontWeight: 700 }}>{t.dueNow}</small>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button onClick={() => onStartReview(item.text)} className="primary" style={{ padding: '0.5rem 1rem' }}>{t.review}</button>
+                                                <button onClick={() => onDelete(item.text)} className="stop-btn" style={{ padding: '0.5rem' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {pendingItems.map(item => (
+                                        <div key={item.text} className="srs-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{ margin: 0, opacity: 0.7 }}>{item.text.substring(0, 100)}...</p>
+                                                <small style={{ color: 'var(--text-muted)' }}>Due in {formatTime(item.nextReview - Date.now())}</small>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button onClick={() => onStartReview(item.text)} className="secondary-btn" style={{ padding: '0.5rem 1rem' }}>{t.practiceEarly}</button>
+                                                <button onClick={() => onDelete(item.text)} className="stop-btn" style={{ padding: '0.5rem' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [lang, setLang] = useState(localStorage.getItem('memora-lang') || 'en');
+            const t = translations[lang];
+            const [originalText, setOriginalText] = useState("");
+            const [showReviewQueue, setShowReviewQueue] = useState(false);
+            const [blurAmount, setBlurAmount] = useState(14);
+
+            const { srsData, dueItems, pendingItems, deleteSRSItem, saveSRSItem } = useSRS();
+            const { voices, selectedVoiceURI, setSelectedVoiceURI, rate, setRate, isSpeaking, isPaused, play, pause, resume, stop } = useTTS(originalText);
+            const recall = useRecallLogic(originalText);
+
+            useEffect(() => { localStorage.setItem('memora-lang', lang); }, [lang]);
+
+            useEffect(() => {
+                if (recall.isChecked && !recall.isRetry && originalText.trim()) saveSRSItem(originalText, recall.accuracy);
+                if (recall.isChecked && recall.accuracy === 100) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#a855f7', '#34d399'] });
+            }, [recall.isChecked, recall.accuracy]);
+
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (!recall.isStarted && e.key === 'Enter' && originalText.trim()) recall.setIsStarted(true);
+                    else if (e.key === 'Enter' && !recall.isChecked && recall.canCheck && !e.ctrlKey) { e.preventDefault(); recall.setIsChecked(true); }
+                    else if (e.key === 'Escape') { recall.setIsStarted(false); recall.setUserInput(""); recall.setIsChecked(false); recall.setIsRetry(false); }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [recall, originalText]);
+
+            const handleNextRound = () => {
+                if (recall.accuracy > 90) recall.setDifficulty(d => Math.min(5, d + 1));
+                else if (recall.accuracy < 60) recall.setDifficulty(d => Math.max(1, d - 1));
+                recall.setUserInput(""); recall.setIsRetry(false); recall.setIsChecked(false); recall.setManualIsHidden(null);
+            };
+
+            const handleRetryMistakes = () => {
+                const mistakes = new Set();
+                recall.comparison.forEach(it => { if (it.status === 'incorrect' || it.status === 'missing') mistakes.add(it.index); });
+                if (mistakes.size === 0) return;
+                recall.setClozeIndices(mistakes); recall.setIsRetry(true); recall.setUserInput(""); recall.setIsChecked(false);
+            };
+
+            const isRefHidden = recall.isRetry ? false : (recall.manualIsHidden !== null ? recall.manualIsHidden : (recall.difficulty === 3 || recall.difficulty === 5));
+            const isRefBlurred = (recall.manualIsHidden === null && !recall.isRetry) && (recall.difficulty === 2);
+
+            return (
+                <div className="container">
+                    <Header lang={lang} setLang={setLang} t={t} onOpenCollection={() => setShowReviewQueue(true)} collectionCount={dueItems.length + pendingItems.length} />
+                    {!recall.isStarted ? (
+                        <HomeView t={t} originalText={originalText} setOriginalText={setOriginalText} onStart={() => recall.setIsStarted(true)} hasCollection={dueItems.length + pendingItems.length > 0} onOpenCollection={() => setShowReviewQueue(true)} />
+                    ) : (
+                        <>
+                            <Dashboard t={t} recall={recall} />
+                            <div className="main-layout">
+                                <div className="panel">
+                                    <div className="panel-header">
+                                        <div className="panel-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>{t.referenceText}</div>
+                                        <div className="panel-actions">
+                                            {recall.difficulty === 2 && !recall.isRetry && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem' }}>
+                                                    <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{t.blurLevel}:</label>
+                                                    <input type="range" min="2" max="25" step="1" value={blurAmount} onChange={(e) => setBlurAmount(Number(e.target.value))} style={{ width: '80px', accentColor: '#a855f7', margin: 0 }} />
+                                                </div>
+                                            )}
+                                            <button onClick={() => recall.setManualIsHidden(!isRefHidden)} className="secondary-btn">{isRefHidden ? t.showText : t.hideText}</button>
+                                        </div>
+                                    </div>
+                                    {!isRefHidden ? (
+                                        (recall.activeMode === 'cloze' || recall.activeMode === 'retry') ? (
+                                            <div className="diff-display" style={{ minHeight: '150px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.3)' }}>
+                                                {recall.comparison.map(item => (
+                                                    <span key={item.index} className={`word ${item.status === 'visible' ? 'visible' : 'missing'}`}>
+                                                        {item.status === 'visible' ? item.word : '___'}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <textarea className={isRefBlurred ? "text-blurred" : ""} value={originalText} onChange={(e) => setOriginalText(e.target.value)} spellCheck="false" style={{ minHeight: '150px', '--blur-amt': `${blurAmount}px` }} />
+                                        )
+                                    ) : (
+                                        <div className="reference-text" style={{ minHeight: '150px' }}>{recall.difficulty === 5 ? t.dictation : t.hiddenText}</div>
+                                    )}
+                                    <div className="tts-controls">
+                                        <select value={selectedVoiceURI} onChange={(e) => setSelectedVoiceURI(e.target.value)} className="tts-select">{voices.map(v => <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>)}</select>
+                                        <div className="rate-control"><label>{t.speed}: {rate.toFixed(1)}x</label><input type="range" min="0.5" max="2" step="0.1" value={rate} onChange={(e) => setRate(parseFloat(e.target.value))} /></div>
+                                        <button onClick={isSpeaking && !isPaused ? pause : (isPaused ? resume : play)} className="speak-btn">{isSpeaking && !isPaused ? t.pause : (isPaused ? t.resume : t.play)}</button>
+                                    </div>
+                                </div>
+                                <div className="panel">
+                                    <div className="panel-header">
+                                        <div className="panel-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path></svg>{t.practiceArea}</div>
+                                        <button onClick={() => recall.setIsStarted(false)} className="secondary-btn">{t.restart}</button>
+                                    </div>
+                                    <textarea placeholder={recall.activeMode === 'cloze' ? t.placeholderCloze : (recall.activeMode === 'retry' ? t.placeholderRetry : (recall.activeMode === 'dictation' ? t.placeholderDict : t.placeholderFull))} value={recall.userInput} onChange={(e) => recall.setUserInput(e.target.value)} disabled={recall.isChecked} style={{ minHeight: '300px' }} />
+                                    {recall.canCheck && <button onClick={() => recall.setIsChecked(true)} className="primary" style={{ width: '100%', marginTop: '1.5rem', padding: '1rem' }}>{t.checkBtn}</button>}
+                                    {recall.isChecked && (
+                                        <div className="completion-banner">
+                                            <h3>{t.roundComplete}</h3>
+                                            <p>{t.finalAccuracy}: <strong>{recall.accuracy}%</strong></p>
+                                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+                                                {recall.accuracy < 100 && <button onClick={handleRetryMistakes} className="primary">{t.retryMistakes}</button>}
+                                                <button onClick={handleNextRound} className="secondary-btn">{recall.accuracy > 90 ? t.advanceTo : t.retryLevel}</button>
+                                            </div>
+                                            <div className="diff-display" style={{ marginTop: '2rem', textAlign: 'left' }}>{recall.comparison.map(item => <span key={item.index} className={`word ${item.status}`}>{item.displayWord} </span>)}</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    {showReviewQueue && <CollectionModal t={t} dueItems={dueItems} pendingItems={pendingItems} onStartReview={(txt) => { setOriginalText(txt); recall.setIsStarted(true); setShowReviewQueue(false); }} onDelete={deleteSRSItem} onClose={() => setShowReviewQueue(false)} />}
+                    <div className="footer" style={{ textAlign: 'center', padding: '2rem 0', opacity: 0.5 }}>{t.footer}</div>
+                </div>
+            );
+        }
+
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(
+            <>
+                <div className="bg-orbit">
+                    <div className="orbit-node node1"></div>
+                    <div className="orbit-node node2"></div>
+                    <div className="orbit-node node3"></div>
+                </div>
+                <App />
+            </>
+        );
     </script>
 </body>
+
 </html>
